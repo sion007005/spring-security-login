@@ -4,6 +4,7 @@ import com.sion.springsecuritylogin.model.User;
 import com.sion.springsecuritylogin.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 public class IndexController {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("/")
     public String index() {
@@ -40,13 +42,15 @@ public class IndexController {
     }
 
     @PostMapping("/join")
-    @ResponseBody
     public String join(User user) {
-        System.out.println("successfully joined! " + user.getUsername());
+        String rawPassword = user.getPassword();
+        String encodedPassword = bCryptPasswordEncoder.encode(rawPassword);
 
+        user.setPassword(encodedPassword);
         user.setRole("ROLE_USER");
-        userRepository.save(user); // TODO 이 상태로는 비밀번호가 암호화가 되어있지 않아서 시큐리티로 로그인 할 수 없다.
 
-        return "join";
+        userRepository.save(user);
+
+        return "redirect:/join";
     }
 }

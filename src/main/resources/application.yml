@@ -1,0 +1,15 @@
+server:
+  port: 9999
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/security_practice?serverTimezone=Asia/Seoul
+    username: security_tester
+    password: 
+
+jpa:
+  hibernate:
+    ddl-auto:create
+    physical-strategy:org:hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql:true

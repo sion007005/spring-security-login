@@ -2,6 +2,9 @@ package com.sion.springsecuritylogin.oauth;
 
 import com.sion.springsecuritylogin.auth.PrincipalDetails;
 import com.sion.springsecuritylogin.model.User;
+import com.sion.springsecuritylogin.oauth.provider.FacebookUserInfo;
+import com.sion.springsecuritylogin.oauth.provider.GoogleUserInfo;
+import com.sion.springsecuritylogin.oauth.provider.OAuth2UserInfo;
 import com.sion.springsecuritylogin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,14 +26,23 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         System.out.println("userRequest.getClientRegistration() = " + userRequest.getClientRegistration());
 
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println("getAttributes: " + oAuth2User.getAttributes()); // 필요한 정보는 여기에 있다. (사용자이름, 이메일 등)
+        OAuth2User oauth2User = super.loadUser(userRequest);
+        System.out.println("getAttributes: " + oauth2User.getAttributes()); // 필요한 정보는 여기에 있다. (사용자이름, 이메일 등)
 
         // 자동으로 회원가입 시킨다.
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // google
-        String providerId = oAuth2User.getAttribute("sub"); // 구글의 pk 
-        String username = provider + "_" + providerId; //google_받아온 숫자
-        String email = oAuth2User.getAttribute("email");
+        OAuth2UserInfo oauth2UserInfo = null;
+        String provider = userRequest.getClientRegistration().getRegistrationId();
+        if (provider.equals("google")) {
+            oauth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
+        } else if (provider.equals("facebook")) {
+            oauth2UserInfo = new FacebookUserInfo(oauth2User.getAttributes());
+        } else {
+            System.out.println(provider + " 로그인은 지원하지 않습니다.");
+        }
+
+        String providerId = oauth2UserInfo.getProviderId();
+        String username = provider + "_" + providerId;
+        String email = oauth2UserInfo.getEmail();
 //        String password = bCryptPasswordEncoder.encode("getinthere"); // 비밀번호는 크게 의미없음
         String role = "ROLE_USER";
 
@@ -40,7 +52,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         if (Objects.isNull(userEntity)) {
             userEntity = User.builder()
                             .username(username)
-                            .password("temp")
+//                            .password("temp")
                             .email(email)
                             .role(role)
                             .provider(provider)
@@ -50,6 +62,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             userRepository.save(userEntity);
         }
 
-        return new PrincipalDetails(userEntity, oAuth2User.getAttributes()); // 만들어진 객체는 Authentication에 들어간다.
+        return new PrincipalDetails(userEntity, oauth2User.getAttributes()); // 만들어진 객체는 Authentication에 들어간다.
     }
 }

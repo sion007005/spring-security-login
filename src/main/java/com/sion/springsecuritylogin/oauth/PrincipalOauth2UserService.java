@@ -4,6 +4,7 @@ import com.sion.springsecuritylogin.auth.PrincipalDetails;
 import com.sion.springsecuritylogin.model.User;
 import com.sion.springsecuritylogin.oauth.provider.FacebookUserInfo;
 import com.sion.springsecuritylogin.oauth.provider.GoogleUserInfo;
+import com.sion.springsecuritylogin.oauth.provider.NaverUserInfo;
 import com.sion.springsecuritylogin.oauth.provider.OAuth2UserInfo;
 import com.sion.springsecuritylogin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -36,6 +38,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             oauth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
         } else if (provider.equals("facebook")) {
             oauth2UserInfo = new FacebookUserInfo(oauth2User.getAttributes());
+        } else if (provider.equals("naver")) {
+            oauth2UserInfo = new NaverUserInfo((Map) oauth2User.getAttributes().get("response"));
         } else {
             System.out.println(provider + " 로그인은 지원하지 않습니다.");
         }

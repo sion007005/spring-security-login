@@ -23,6 +23,9 @@
         <button type="button" class="btn-login-facebook">
             <a href="/oauth2/authorization/facebook">페이스북 로그인</a>
         </button>
+        <button type="button" class="btn-login-naver">
+            <a href="/oauth2/authorization/naver">네이버 로그인</a>
+        </button>
         <button type="button" class="btn-sign-up">
             <a href="/join">가입하기</a>
         </button>
@@ -137,6 +140,24 @@
         height:40px;
         background-position: left;
         background-color: dodgerblue;
+        background-size: 200%;
+        color:white;
+        font-weight: bold;
+        border:none;
+        cursor:pointer;
+        transition: 0.4s;
+        display:inline;
+    }
+
+    .btn-login-naver {
+        position:relative;
+        left:40%;
+        transform: translateX(-50%);
+        margin-bottom: 10px;
+        width:80%;
+        height:40px;
+        background-position: left;
+        background-color: darkgreen;
         background-size: 200%;
         color:white;
         font-weight: bold;
